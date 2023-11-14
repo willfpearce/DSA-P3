@@ -40,6 +40,12 @@ UseImgui::UseImgui(Params params) : params(params) {
     clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 }
 
+
+// Win32 message handler
+// You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
+// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
+// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
+// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
 void UseImgui::Update(bool& done) {
     // Poll and handle messages (inputs, window resize, etc.)
     // See the WndProc() function below for our to dispatch events to the Win32 backend.
@@ -142,8 +148,3 @@ void UseImgui::ResetDevice()
     ImGui_ImplDX9_CreateDeviceObjects();
 }
 
-// Win32 message handler
-// You can read the imguiObj.io.WantCaptureMouse, imguiObj.io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-// - When imguiObj.io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
-// - When imguiObj.io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
-// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.

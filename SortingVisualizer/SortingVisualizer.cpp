@@ -1,5 +1,3 @@
-// Dear ImGui: standalone example application for DirectX 9
-
 // Learn about Dear ImGui:
 // - FAQ                  https://dearimgui.com/faq
 // - Getting Started      https://dearimgui.com/getting-started
@@ -33,5 +31,3 @@ int main(int, char**)
 
     return 0;
 }
-
-// Helper functions
