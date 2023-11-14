@@ -1,11 +1,20 @@
 #pragma once
 
-#include <imgui.h>
+#include "imgui.h"
+#include "params.h"
 
 class UseImgui {
+private:
+    bool show_demo_window;
+    bool show_another_window;
+    ImVec4 clear_color;
+    ImGuiIO* io;
+    void ResetDevice();
+
+    Params params;
 public:
-    void Init();
-    virtual void Update();
+    UseImgui(Params params);
+    void Update(bool& done);
     void Render();
-    void Shutdown();
+    ~UseImgui();
 };
