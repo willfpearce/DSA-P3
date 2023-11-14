@@ -4,6 +4,9 @@ project(SortingVisualizer)
 
 add_executable(SortingVisualizer
     SortingVisualizer/SortingVisualizer.cpp
+    SortingVisualizer/UseImgui.cpp
+    SortingVisualizer/DX9Window.cpp
+    SortingVisualizer/proc.cpp
     imgui/imgui.cpp imgui/imgui_impl_win32.cpp
     imgui/imgui_impl_dx9.cpp
     imgui/imgui_demo.cpp
