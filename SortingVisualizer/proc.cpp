@@ -1,4 +1,5 @@
 #include "proc.h"
+#include "params.h"
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {

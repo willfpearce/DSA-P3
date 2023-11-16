@@ -1,3 +1,4 @@
+#include <iostream>
 #include "UseImgui.h"
 #include "imgui_impl_dx9.h"
 #include "imgui_impl_win32.h"
@@ -7,6 +8,8 @@ UseImgui::UseImgui(Params params) : params(params) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     io = &ImGui::GetIO(); (void)io;
+
+    // could be unnecessary if keyboard unused but leaving it here for now
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
@@ -18,26 +21,7 @@ UseImgui::UseImgui(Params params) : params(params) {
     ImGui_ImplWin32_Init(params.hwnd);
     ImGui_ImplDX9_Init(params.g_pd3dDevice);
 
-    // Load Fonts
-    // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-    // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-    // - If the file cannot be loaded, the function will return a nullptr. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-    // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-    // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
-    // - Read 'docs/FONTS.md' for more instructions and details.
-    // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-    //io.Fonts->AddFontDefault();
-    //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-    //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-    //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
-    //IM_ASSERT(font != nullptr);
-
-    // Our state
-    show_demo_window = true;
-    show_another_window = false;
-    clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    // TODO: set up class state: current algo/state, step speed
 }
 
 
@@ -76,45 +60,69 @@ void UseImgui::Render() {
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-    if (show_demo_window)
-        ImGui::ShowDemoWindow(&show_demo_window);
+    ImGui::ShowDemoWindow();
 
-    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+    // Create options window
+    // TODO: Possibly change formatting for options to be along one line on top?
     {
-        static float f = 0.0f;
-        static int counter = 0;
+        // TODO: store static variables as class member variables so they are accessible in all functions
+        // TODO: we need to create a system for updating the sorting visualizer iff the step time has elapsed
+        // TODO: we need to create a system for changing the visualization if the state or sorting algorithm is changed
+        // TODO: create pause functionality
 
-        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+        ImGui::Begin("Options"); // Create a window called "Options" and append into it.
 
-        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-        ImGui::Checkbox("Another Window", &show_another_window);
+        static int currentState = 0;
+        const char* states[] = {"Florida", "California", "Texas"};
+        static int numStates = 3;
+        ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.30);
+        ImGui::Combo("State", &currentState, states, numStates); // Dropdown of items in states[]
 
-        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+        static int currentAlgo;
+        const char* algos[] = {"Merge", "Shell", "Quick"};
+        ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.30);
+        ImGui::Combo("Sorting Algorithm", &currentAlgo, algos, 3); // Dropdown of Sorting algos
 
-        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-            counter++;
-        ImGui::SameLine();
-        ImGui::Text("counter = %d", counter);
+        static int stepSpeed = 3;
+        int minSpeed = 1;
+        int maxSpeed = 5;
+        ImGui::SliderInt("Step Speed", &stepSpeed, minSpeed, maxSpeed);
 
-        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io->Framerate, io->Framerate);
+        if (ImGui::Button("-"))
+            stepSpeed = stepSpeed > minSpeed ? stepSpeed - 1 : stepSpeed;
+        ImGui::SameLine(ImGui::GetWindowWidth() * 0.075);
+
+        static int paused = true;
+        if (ImGui::Button("Pause")) {
+            paused = !paused;
+            std::cout << (paused ? "Paused!" : "Now Playing!") << "\n";
+        }
+
+        ImGui::SameLine(ImGui::GetWindowWidth() * 0.2);
+        if (ImGui::Button("+"))
+            stepSpeed = stepSpeed < maxSpeed ? stepSpeed + 1 : stepSpeed;
+
+        ImGui::SameLine(ImGui::GetWindowWidth() * 0.275);
+        ImGui::Text(paused ? "Mode: Paused" : "Mode: Playing");
+
         ImGui::End();
     }
 
-    // 3. Show another simple window.
-    if (show_another_window)
+    // create visualization window
     {
-        ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-        ImGui::Text("Hello from another window!");
-        if (ImGui::Button("Close Me"))
-            show_another_window = false;
+        ImGui::Begin("Visualization");
+        const float values[] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f};
+
+        ImGui::PlotHistogram("Data", values, 10);
+
         ImGui::End();
     }
 
     // Rendering
     ImGui::EndFrame();
+
+    ImVec4 clear_color(0.5, 0.75, 1.0, 1.0);
+
     params.g_pd3dDevice->SetRenderState(D3DRS_ZENABLE, FALSE);
     params.g_pd3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
     params.g_pd3dDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);

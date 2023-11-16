@@ -6,15 +6,16 @@
 
 #include "UseImgui.h"
 #include "DX9Window.h"
-#include "proc.h"
+#include "params.h"
 
 #define WINDOW_WIDTH 1280
 #define WINDOW_HEIGHT 720
+#define WINDOW_TITLE L"Dear ImGui Sorting Visualizer"
 
 // Main code
 int main(int, char**)
 {
-    DX9Window window(g_pD3D, g_pd3dDevice, g_ResizeWidth, g_ResizeHeight, g_d3dpp, WINDOW_WIDTH, WINDOW_HEIGHT);
+    DX9Window window(g_pD3D, g_pd3dDevice, g_ResizeWidth, g_ResizeHeight, g_d3dpp, WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE);
     if (!window.InitWindow())
         return 1;
 
