@@ -7,10 +7,10 @@
 
 class SortingAlgorithm {
 protected:
-    std::vector<std::array<std::pair<std::string, int>, 50000>> sortingSteps;
+    std::vector<std::array<std::pair<std::string, int>, 1000>> sortingSteps;
     size_t currentStep;
 public:
-    std::array<std::pair<std::string, int>, 50000> getNextStep();
-    std::array<std::pair<std::string, int>, 50000> getPreviousStep();
+    std::array<std::pair<std::string, int>, 1000> getNextStep();
+    std::array<std::pair<std::string, int>, 1000> getPreviousStep();
     bool areNoStepsRemaining();
 };
