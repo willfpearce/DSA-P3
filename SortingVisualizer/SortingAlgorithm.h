@@ -6,7 +6,7 @@
 #pragma once
 
 class SortingAlgorithm {
-private:
+protected:
     std::vector<std::array<std::pair<std::string, int>, 50000>> sortingSteps;
     size_t currentStep;
 public:
