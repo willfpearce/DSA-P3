@@ -7,7 +7,6 @@
 
 #define SIZE 1000
 
-
 std::random_device rd;
 std::mt19937 gen(rd());
 
@@ -48,5 +47,6 @@ int main() {
 
     test("QuickSort", qs.getSorted(), sortedRandomData);
     test("ShellSort", ss.getSorted(), sortedRandomData);
+//    test("MergeSort", ms.getSorted(), sortedRandomData);
 
 }
