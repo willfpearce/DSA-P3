@@ -3,7 +3,7 @@
 #include <string>
 
 DX9Window::DX9Window(LPDIRECT3D9& g_pD3D, LPDIRECT3DDEVICE9& g_pd3dDevice, UINT& g_ResizeWidth, UINT& g_ResizeHeight, D3DPRESENT_PARAMETERS& g_d3dpp, UINT windowWidth, UINT windowHeight, LPCWSTR windowTitle) :
-    g_pD3D(g_pD3D), g_pd3dDevice(g_pd3dDevice), g_ResizeWidth(g_ResizeWidth), g_ResizeHeight(g_ResizeHeight), g_d3dpp(g_d3dpp)
+    g_pD3D(g_pD3D), g_pd3dDevice(g_pd3dDevice), g_ResizeWidth(g_ResizeWidth), g_ResizeHeight(g_ResizeHeight), g_d3dpp(g_d3dpp), windowWidth(windowWidth), windowHeight(windowHeight)
 {
     std::string iconFileName = "resources\\icon.ico";
     HANDLE iconHandle = BeginUpdateResourceA(iconFileName.c_str(), false);
@@ -57,7 +57,7 @@ void DX9Window::CleanupDeviceD3D()
 }
 
 Params DX9Window::getParams() {
-    return {g_pD3D, g_pd3dDevice, g_ResizeWidth, g_ResizeHeight, g_d3dpp, wc, hwnd};
+    return {g_pd3dDevice, g_ResizeWidth, g_ResizeHeight, g_d3dpp, hwnd, windowWidth, windowHeight};
 }
 
 DX9Window::~DX9Window() {

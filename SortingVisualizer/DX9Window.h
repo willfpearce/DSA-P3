@@ -11,6 +11,7 @@ class DX9Window {
 private:
     WNDCLASSEXW wc;
     HWND hwnd;
+    UINT windowWidth, windowHeight;
 
     LPDIRECT3D9& g_pD3D; LPDIRECT3DDEVICE9& g_pd3dDevice; UINT& g_ResizeWidth; UINT& g_ResizeHeight; D3DPRESENT_PARAMETERS& g_d3dpp;
 
