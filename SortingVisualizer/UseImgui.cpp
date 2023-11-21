@@ -22,6 +22,7 @@ UseImgui::UseImgui(Params params) : params(params) {
     ImGui_ImplDX9_Init(params.g_pd3dDevice);
 
     // TODO: set up class state: current algo/state, step speed
+    currentState = states[0];
 }
 
 
@@ -60,7 +61,7 @@ void UseImgui::Render() {
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-    ImGui::ShowDemoWindow();
+//    ImGui::ShowDemoWindow();
 
     // Create options window
     // TODO: Possibly change formatting for options to be along one line on top?
@@ -70,18 +71,42 @@ void UseImgui::Render() {
         // TODO: we need to create a system for changing the visualization if the state or sorting algorithm is changed
         // TODO: create pause functionality
 
+        // set options window to max width and height
+        ImGui::SetNextWindowSize(io->DisplaySize);
+        ImGui::SetNextWindowPos({0, 0});
+
         ImGui::Begin("Options"); // Create a window called "Options" and append into it.
 
-        static int currentState = 0;
-        const char* states[] = {"Florida", "California", "Texas"};
-        static int numStates = 3;
-        ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.30);
-        ImGui::Combo("State", &currentState, states, numStates); // Dropdown of items in states[]
+        ImGui::SetNextItemWidth(130);
 
-        static int currentAlgo;
-        const char* algos[] = {"Merge", "Shell", "Quick"};
-        ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.30);
-        ImGui::Combo("Sorting Algorithm", &currentAlgo, algos, 3); // Dropdown of Sorting algos
+        if (ImGui::BeginCombo("State", currentState)) // The second parameter is the label previewed before opening the combo.
+        {
+            for (int i = 0; i < numStates; i++)
+            {
+                bool isSelected = (currentState == states[i]);
+                if (ImGui::Selectable(states[i], isSelected))
+                    currentState = states[i];
+                if (isSelected)
+                    ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
+            }
+            ImGui::EndCombo();
+        }
+
+        ImGui::SameLine(0, 25);
+        ImGui::SetNextItemWidth(100);
+
+        if (ImGui::BeginCombo("Sorting Algorithm", currentAlgo))
+        {
+            for (int i = 0; i < numAlgos; i++)
+            {
+                bool isSelected = (currentAlgo == algos[i]);
+                if (ImGui::Selectable(algos[i], isSelected))
+                    currentAlgo = algos[i];
+                if (isSelected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndCombo();
+        }
 
         static int stepSpeed = 3;
         int minSpeed = 1;
