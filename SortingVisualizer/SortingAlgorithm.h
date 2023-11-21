@@ -13,4 +13,5 @@ public:
     std::array<std::pair<std::string, int>, 1000> getNextStep();
     std::array<std::pair<std::string, int>, 1000> getPreviousStep();
     bool areNoStepsRemaining();
+    std::array<std::pair<std::string, int>, 1000> getSorted();
 };

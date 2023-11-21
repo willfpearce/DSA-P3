@@ -11,3 +11,7 @@ std::array<std::pair<std::string, int>, 1000> SortingAlgorithm::getPreviousStep(
 bool SortingAlgorithm::areNoStepsRemaining() {
     return currentStep == sortingSteps.size() - 1;
 }
+
+std::array<std::pair<std::string, int>, 1000> SortingAlgorithm::getSorted() {
+    return sortingSteps.back();
+}
