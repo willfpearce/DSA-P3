@@ -17,7 +17,7 @@ private:
     bool CreateDeviceD3D();
     void CleanupDeviceD3D();
 public:
-    DX9Window(LPDIRECT3D9& g_pD3D, LPDIRECT3DDEVICE9& g_pd3dDevice, UINT& g_ResizeWidth, UINT& g_ResizeHeight, D3DPRESENT_PARAMETERS& g_d3dpp, UINT windowWidth, UINT windowHeight);
+    DX9Window(LPDIRECT3D9& g_pD3D, LPDIRECT3DDEVICE9& g_pd3dDevice, UINT& g_ResizeWidth, UINT& g_ResizeHeight, D3DPRESENT_PARAMETERS& g_d3dpp, UINT windowWidth, UINT windowHeight, LPCWSTR windowTitle);
     bool InitWindow();
     Params getParams();
     ~DX9Window();

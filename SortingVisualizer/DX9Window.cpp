@@ -1,14 +1,18 @@
 #include "DX9Window.h"
 #include "proc.h"
+#include <string>
 
-DX9Window::DX9Window(LPDIRECT3D9& g_pD3D, LPDIRECT3DDEVICE9& g_pd3dDevice, UINT& g_ResizeWidth, UINT& g_ResizeHeight, D3DPRESENT_PARAMETERS& g_d3dpp, UINT windowWidth, UINT windowHeight) :
+DX9Window::DX9Window(LPDIRECT3D9& g_pD3D, LPDIRECT3DDEVICE9& g_pd3dDevice, UINT& g_ResizeWidth, UINT& g_ResizeHeight, D3DPRESENT_PARAMETERS& g_d3dpp, UINT windowWidth, UINT windowHeight, LPCWSTR windowTitle) :
     g_pD3D(g_pD3D), g_pd3dDevice(g_pd3dDevice), g_ResizeWidth(g_ResizeWidth), g_ResizeHeight(g_ResizeHeight), g_d3dpp(g_d3dpp)
 {
+    std::string iconFileName = "resources\\icon.ico";
+    HANDLE iconHandle = BeginUpdateResourceA(iconFileName.c_str(), false);
+
     // Create application window
     //ImGui_ImplWin32_EnableDpiAwareness();
     wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ImGui Example", nullptr };
     ::RegisterClassExW(&wc);
-    hwnd = ::CreateWindowW(wc.lpszClassName, L"Dear ImGui DirectX9 Example", WS_OVERLAPPEDWINDOW, 100, 100, windowWidth, windowHeight, nullptr, nullptr, wc.hInstance, nullptr);
+    hwnd = ::CreateWindowW(wc.lpszClassName, windowTitle, WS_OVERLAPPEDWINDOW, 100, 100, windowWidth, windowHeight, nullptr, nullptr, wc.hInstance, nullptr);
 }
 
 bool DX9Window::InitWindow() {
