@@ -20,11 +20,16 @@ private:
     void ResetDevice();
     Params params;
 
-    int numStates = 50;
+    const int numStates = 50;
     const char* currentState = states[0];
 
-    int numAlgos = 3;
+    const int numAlgos = 3;
     const char* currentAlgo = algos[0];
+
+    int stepSpeed = 3;
+    const int minSpeed = 1;
+    const int maxSpeed = 5;
+    int paused = true;
 
 public:
     UseImgui(Params params);

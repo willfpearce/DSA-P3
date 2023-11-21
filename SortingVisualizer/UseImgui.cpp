@@ -77,9 +77,9 @@ void UseImgui::Render() {
 
         ImGui::Begin("Options"); // Create a window called "Options" and append into it.
 
+        // State Selector Dropdown
         ImGui::SetNextItemWidth(130);
-
-        if (ImGui::BeginCombo("State", currentState)) // The second parameter is the label previewed before opening the combo.
+        if (ImGui::BeginCombo("State", currentState))
         {
             for (int i = 0; i < numStates; i++)
             {
@@ -87,11 +87,12 @@ void UseImgui::Render() {
                 if (ImGui::Selectable(states[i], isSelected))
                     currentState = states[i];
                 if (isSelected)
-                    ImGui::SetItemDefaultFocus();   // Set the initial focus when opening the combo (scrolling + for keyboard navigation support in the upcoming navigation branch)
+                    ImGui::SetItemDefaultFocus();
             }
             ImGui::EndCombo();
         }
 
+        // Sorting Algorithm drop down
         ImGui::SameLine(0, 25);
         ImGui::SetNextItemWidth(100);
 
@@ -108,26 +109,24 @@ void UseImgui::Render() {
             ImGui::EndCombo();
         }
 
-        static int stepSpeed = 3;
-        int minSpeed = 1;
-        int maxSpeed = 5;
+        // Step Speed Slider
+        ImGui::SameLine(0, 25);
+        ImGui::SetNextItemWidth(250);
         ImGui::SliderInt("Step Speed", &stepSpeed, minSpeed, maxSpeed);
 
-        if (ImGui::Button("-"))
-            stepSpeed = stepSpeed > minSpeed ? stepSpeed - 1 : stepSpeed;
-        ImGui::SameLine(ImGui::GetWindowWidth() * 0.075);
-
-        static int paused = true;
+        ImGui::SameLine(0, 25);
+        if (ImGui::Button("<- Step")) 0;
+//            step back here
+        ImGui::SameLine(0, 6);
         if (ImGui::Button("Pause")) {
             paused = !paused;
             std::cout << (paused ? "Paused!" : "Now Playing!") << "\n";
         }
+        ImGui::SameLine(0, 6);
+        if (ImGui::Button("Step ->")) 0;
+//            step forward here
 
-        ImGui::SameLine(ImGui::GetWindowWidth() * 0.2);
-        if (ImGui::Button("+"))
-            stepSpeed = stepSpeed < maxSpeed ? stepSpeed + 1 : stepSpeed;
-
-        ImGui::SameLine(ImGui::GetWindowWidth() * 0.275);
+        ImGui::SameLine(0, 10);
         ImGui::Text(paused ? "Mode: Paused" : "Mode: Playing");
 
         ImGui::End();
