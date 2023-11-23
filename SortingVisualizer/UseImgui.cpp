@@ -18,10 +18,20 @@ int getRandom(int low, int high){
     return distribution(gen);
 }
 
+// TODO remove this function
 std::array<std::pair<std::string, int>, 1000> generateData(){
     std::array<std::pair<std::string, int>, 1000> data;
     for(int i = 0; i < 1000; i++){
         data[i] = std::make_pair("", getRandom(1, 10000));
+    }
+    return data;
+};
+
+// TODO remove this function
+float* generateFloatData() {
+    auto data = new float[1000];
+    for(int i = 0; i < 1000; i++){
+        data[i] = (float)getRandom(1, 10000);
     }
     return data;
 };
@@ -102,8 +112,6 @@ void UseImgui::Render() {
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 
-//    ImGui::ShowDemoWindow();
-
     // Create options window
     {
         // TODO: we need to create a system for updating the sorting visualizer iff the step time has elapsed
@@ -114,8 +122,11 @@ void UseImgui::Render() {
         ImGui::SetNextWindowSize(io->DisplaySize);
         ImGui::SetNextWindowPos({0, 0});
 
-        ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoCollapse;
+        ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar;
         ImGui::Begin("Options", nullptr, windowFlags); // Create a window called "Options" and append into it.
+
+        // Title
+        ImGui::SeparatorText("Options");
 
         // State Selector Dropdown
         ImGui::SetNextItemWidth(130);
@@ -175,15 +186,19 @@ void UseImgui::Render() {
         ImGui::SameLine(0, 10);
         ImGui::Text(paused ? "Mode: Paused" : "Mode: Playing");
 
-        ImGui::End();
-    }
 
-    // create visualization window
-    {
-        ImGui::Begin("Visualization");
-        const float values[] = {1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f, 10.0f};
+        // create visualization
+        ImGui::InvisibleButton("padding", {5, 5}); // padding
+        ImGui::SeparatorText("Visualization"); // Title
 
-        ImGui::PlotHistogram("Data", values, 10);
+        // TODO switch data with SortingAlgorithmData
+        // minor memory leak here
+        static float* data = generateFloatData();
+        // these variables represent the lowest and highest values of the population so they'll change when we figure out how we're generating the data
+        const float scaleMin = 0.0f;
+        const float scaleMax = 10000.0f;
+        ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.99);
+        ImGui::PlotHistogram("", data, 1000, 0, nullptr, scaleMin, scaleMax, {0.0f, 575.0f});
 
         ImGui::End();
     }
