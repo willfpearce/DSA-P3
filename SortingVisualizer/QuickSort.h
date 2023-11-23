@@ -1,6 +1,8 @@
 #include "SortingAlgorithm.h"
 #pragma once
 
+
+// TODO separate into header and source files
 class QuickSort : public SortingAlgorithm{ //Class for the Quicksort algorithm
 private:
     void Sort(std::array<std::pair<std::string, int>, 1000>& input, int low, int high); //Recursive function that sorts recursively via a quicksort method.
