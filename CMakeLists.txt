@@ -13,7 +13,8 @@ add_executable(SortingVisualizer
     imgui/imgui_draw.cpp
     imgui/imgui_tables.cpp
     imgui/imgui_widgets.cpp
-)
+    SortingVisualizer/SortingAlgorithm.cpp
+    SortingVisualizer/ShellSort.cpp)
 
 target_include_directories(SortingVisualizer PRIVATE ${CMAKE_SOURCE_DIR}/imgui)
 

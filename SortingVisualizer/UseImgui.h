@@ -2,6 +2,7 @@
 
 #include "imgui.h"
 #include "params.h"
+#include "SortingAlgorithm.h"
 
 static const char* states[] = {"Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
                         "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana",
@@ -24,12 +25,17 @@ private:
     const char* currentState = states[0];
 
     const int numAlgos = 3;
-    const char* currentAlgo = algos[0];
+    const char* currentAlgoType = algos[0];
 
     int stepSpeed = 3;
     const int minSpeed = 1;
     const int maxSpeed = 5;
     int paused = true;
+
+    // TODO make use of future library to run SortingAlgorithm constructors on separate thread and show loading message
+    SortingAlgorithm currentAlgo;
+
+    void ChangeAlgo();
 
 public:
     UseImgui(Params params);

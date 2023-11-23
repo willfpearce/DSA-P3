@@ -1,7 +1,30 @@
 #include <iostream>
+#include <random>
+#include <array>
+#include <utility>
+
 #include "UseImgui.h"
 #include "imgui_impl_dx9.h"
 #include "imgui_impl_win32.h"
+//#include "MergeSort.h"
+#include "QuickSort.h"
+#include "ShellSort.h"
+
+std::random_device rd;
+std::mt19937 gen(rd());
+
+int getRandom(int low, int high){
+    std::uniform_int_distribution<int> distribution(low, high);
+    return distribution(gen);
+}
+
+std::array<std::pair<std::string, int>, 1000> generateData(){
+    std::array<std::pair<std::string, int>, 1000> data;
+    for(int i = 0; i < 1000; i++){
+        data[i] = std::make_pair("", getRandom(1, 10000));
+    }
+    return data;
+};
 
 UseImgui::UseImgui(Params params) : params(params) {
     // Setup Dear ImGui context
@@ -21,8 +44,7 @@ UseImgui::UseImgui(Params params) : params(params) {
     ImGui_ImplWin32_Init(params.hwnd);
     ImGui_ImplDX9_Init(params.g_pd3dDevice);
 
-    // TODO: set up class state: current algo/state, step speed
-    currentState = states[0];
+    currentAlgo = QuickSort(generateData());
 }
 
 
@@ -55,6 +77,25 @@ void UseImgui::Update(bool& done) {
     }
 }
 
+// called every time the state or sorting algorithm is changed
+// creates a new Sorting Algorithm object
+// TODO create a map of structure pair<state, algorithmType> : SortingAlgorithm in order to not recreate already stored objects
+// TODO link this function to generated data for states (currently uses random data)
+void UseImgui::ChangeAlgo() {
+    switch ((int)*currentAlgoType) {
+        case (int)*"Merge Sort":
+            // TODO implement merge sort
+            currentAlgo = QuickSort(generateData());
+            break;
+        case (int)*"Shell Sort":
+            currentAlgo = ShellSort(generateData());
+            break;
+        case (int)*"Quick Sort":
+            currentAlgo = QuickSort(generateData());
+            break;
+    }
+}
+
 void UseImgui::Render() {
     // Start the Dear ImGui frame
     ImGui_ImplDX9_NewFrame();
@@ -64,9 +105,7 @@ void UseImgui::Render() {
 //    ImGui::ShowDemoWindow();
 
     // Create options window
-    // TODO: Possibly change formatting for options to be along one line on top?
     {
-        // TODO: store static variables as class member variables so they are accessible in all functions
         // TODO: we need to create a system for updating the sorting visualizer iff the step time has elapsed
         // TODO: we need to create a system for changing the visualization if the state or sorting algorithm is changed
         // TODO: create pause functionality
@@ -75,7 +114,8 @@ void UseImgui::Render() {
         ImGui::SetNextWindowSize(io->DisplaySize);
         ImGui::SetNextWindowPos({0, 0});
 
-        ImGui::Begin("Options"); // Create a window called "Options" and append into it.
+        ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoCollapse;
+        ImGui::Begin("Options", nullptr, windowFlags); // Create a window called "Options" and append into it.
 
         // State Selector Dropdown
         ImGui::SetNextItemWidth(130);
@@ -84,8 +124,11 @@ void UseImgui::Render() {
             for (int i = 0; i < numStates; i++)
             {
                 bool isSelected = (currentState == states[i]);
-                if (ImGui::Selectable(states[i], isSelected))
+                if (ImGui::Selectable(states[i], isSelected)) {
                     currentState = states[i];
+                    ChangeAlgo();
+                }
+
                 if (isSelected)
                     ImGui::SetItemDefaultFocus();
             }
@@ -96,13 +139,16 @@ void UseImgui::Render() {
         ImGui::SameLine(0, 25);
         ImGui::SetNextItemWidth(100);
 
-        if (ImGui::BeginCombo("Sorting Algorithm", currentAlgo))
+        if (ImGui::BeginCombo("Sorting Algorithm", currentAlgoType))
         {
             for (int i = 0; i < numAlgos; i++)
             {
-                bool isSelected = (currentAlgo == algos[i]);
-                if (ImGui::Selectable(algos[i], isSelected))
-                    currentAlgo = algos[i];
+                bool isSelected = (currentAlgoType == algos[i]);
+                if (ImGui::Selectable(algos[i], isSelected)) {
+                    currentAlgoType = algos[i];
+                    ChangeAlgo();
+                }
+
                 if (isSelected)
                     ImGui::SetItemDefaultFocus();
             }
@@ -116,7 +162,7 @@ void UseImgui::Render() {
 
         ImGui::SameLine(0, 25);
         if (ImGui::Button("<- Step")) 0;
-//            step back here
+//            TODO step back here
         ImGui::SameLine(0, 6);
         if (ImGui::Button("Pause")) {
             paused = !paused;
@@ -124,7 +170,7 @@ void UseImgui::Render() {
         }
         ImGui::SameLine(0, 6);
         if (ImGui::Button("Step ->")) 0;
-//            step forward here
+//            TODO step forward here
 
         ImGui::SameLine(0, 10);
         ImGui::Text(paused ? "Mode: Paused" : "Mode: Playing");
