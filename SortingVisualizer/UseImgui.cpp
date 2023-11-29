@@ -119,6 +119,7 @@ void UseImgui::Render() {
     {
         // TODO: we need to create a system for updating the sorting visualizer iff the step time has elapsed
         // TODO: we need to create a system for changing the visualization if the state or sorting algorithm is changed
+        // TODO -------- EDIT: functions exist but now they need to be linked to states data
         // TODO: create pause functionality
 
         // set options window to max width and height
@@ -193,7 +194,7 @@ void UseImgui::Render() {
         ImGui::InvisibleButton("padding", {5, 5}); // padding
         ImGui::SeparatorText("Visualization"); // Title
 
-        // visualization only displays when async sorting algorithm obj has a valid result
+        // visualization only displays when sorting algorithm future has a valid result
         if (currentAlgoFuture.valid() && currentAlgoFuture.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready) {
             // TODO switch data with SortingAlgorithmData
             // minor memory leak here
