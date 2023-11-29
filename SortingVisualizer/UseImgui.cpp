@@ -39,9 +39,6 @@ float* generateFloatData() {
 
 // needs to be updated
 SortingAlgorithm UseImgui::asyncChangeAlgoTask(const char* type) {
-    for (size_t i = 0; i < 1000000; i++)
-        100 + 100;
-
     switch ((int)*type) {
         case (int) *"Merge Sort":
             // TODO implement merge sort
@@ -71,7 +68,7 @@ UseImgui::UseImgui(Params params) : params(params) {
     ImGui_ImplWin32_Init(params.hwnd);
     ImGui_ImplDX9_Init(params.g_pd3dDevice);
 
-    currentAlgoFuture = std::async(std::launch::async, asyncChangeAlgoTask, "Quick Sort");
+    currentAlgoFuture = std::async(std::launch::async, &UseImgui::asyncChangeAlgoTask, this, "Quick Sort");
 }
 
 
@@ -109,7 +106,7 @@ void UseImgui::Update(bool& done) {
 // TODO create a map of structure pair<state, algorithmType> : SortingAlgorithm in order to not recreate already stored objects
 // TODO link this function to generated data for states (currently uses random data)
 void UseImgui::ChangeAlgo() {
-    currentAlgoFuture = std::async(std::launch::async, asyncChangeAlgoTask, currentAlgoType);
+    currentAlgoFuture = std::async(std::launch::async, &UseImgui::asyncChangeAlgoTask, this, currentAlgoType);
 }
 
 void UseImgui::Render() {
