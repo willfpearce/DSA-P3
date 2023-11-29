@@ -1,5 +1,6 @@
 #pragma once
 
+#include <future>
 #include "imgui.h"
 #include "params.h"
 #include "SortingAlgorithm.h"
@@ -32,9 +33,9 @@ private:
     const int maxSpeed = 5;
     int paused = true;
 
-    // TODO make use of future library to run SortingAlgorithm constructors on separate thread and show loading message
-    SortingAlgorithm currentAlgo;
+    std::future<SortingAlgorithm> currentAlgoFuture;
 
+    SortingAlgorithm asyncChangeAlgoTask(const char* type);
     void ChangeAlgo();
 
 public:

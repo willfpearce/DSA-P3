@@ -2,6 +2,7 @@
 #include <random>
 #include <array>
 #include <utility>
+#include <chrono>
 
 #include "UseImgui.h"
 #include "imgui_impl_dx9.h"
@@ -36,6 +37,22 @@ float* generateFloatData() {
     return data;
 };
 
+// needs to be updated
+SortingAlgorithm UseImgui::asyncChangeAlgoTask(const char* type) {
+    for (size_t i = 0; i < 1000000; i++)
+        100 + 100;
+
+    switch ((int)*type) {
+        case (int) *"Merge Sort":
+            // TODO implement merge sort
+            return QuickSort(generateData());
+        case (int) *"Shell Sort":
+            return ShellSort(generateData());
+        case (int) *"Quick Sort":
+            return QuickSort(generateData());
+    }
+}
+
 UseImgui::UseImgui(Params params) : params(params) {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -54,7 +71,7 @@ UseImgui::UseImgui(Params params) : params(params) {
     ImGui_ImplWin32_Init(params.hwnd);
     ImGui_ImplDX9_Init(params.g_pd3dDevice);
 
-    currentAlgo = QuickSort(generateData());
+    currentAlgoFuture = std::async(std::launch::async, asyncChangeAlgoTask, "Quick Sort");
 }
 
 
@@ -88,22 +105,11 @@ void UseImgui::Update(bool& done) {
 }
 
 // called every time the state or sorting algorithm is changed
-// creates a new Sorting Algorithm object
+// runs the SortingAlgorithm constructors asynchronously
 // TODO create a map of structure pair<state, algorithmType> : SortingAlgorithm in order to not recreate already stored objects
 // TODO link this function to generated data for states (currently uses random data)
 void UseImgui::ChangeAlgo() {
-    switch ((int)*currentAlgoType) {
-        case (int)*"Merge Sort":
-            // TODO implement merge sort
-            currentAlgo = QuickSort(generateData());
-            break;
-        case (int)*"Shell Sort":
-            currentAlgo = ShellSort(generateData());
-            break;
-        case (int)*"Quick Sort":
-            currentAlgo = QuickSort(generateData());
-            break;
-    }
+    currentAlgoFuture = std::async(std::launch::async, asyncChangeAlgoTask, currentAlgoType);
 }
 
 void UseImgui::Render() {
@@ -186,19 +192,23 @@ void UseImgui::Render() {
         ImGui::SameLine(0, 10);
         ImGui::Text(paused ? "Mode: Paused" : "Mode: Playing");
 
-
         // create visualization
         ImGui::InvisibleButton("padding", {5, 5}); // padding
         ImGui::SeparatorText("Visualization"); // Title
 
-        // TODO switch data with SortingAlgorithmData
-        // minor memory leak here
-        static float* data = generateFloatData();
-        // these variables represent the lowest and highest values of the population so they'll change when we figure out how we're generating the data
-        const float scaleMin = 0.0f;
-        const float scaleMax = 10000.0f;
-        ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.99);
-        ImGui::PlotHistogram("", data, 1000, 0, nullptr, scaleMin, scaleMax, {0.0f, 575.0f});
+        // visualization only displays when async sorting algorithm obj has a valid result
+        if (currentAlgoFuture.valid() && currentAlgoFuture.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready) {
+            // TODO switch data with SortingAlgorithmData
+            // minor memory leak here
+            static float *data = generateFloatData();
+            // these variables represent the lowest and highest values of the population so they'll change when we figure out how we're generating the data
+            const float scaleMin = 0.0f;
+            const float scaleMax = 10000.0f;
+            ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.99);
+            ImGui::PlotHistogram("", data, 1000, 0, nullptr, scaleMin, scaleMax, {0.0f, 575.0f});
+        } else {
+            ImGui::Text("Loading...");
+        }
 
         ImGui::End();
     }
