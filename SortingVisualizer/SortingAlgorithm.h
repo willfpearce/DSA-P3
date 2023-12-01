@@ -8,6 +8,7 @@
 class SortingAlgorithm {
 protected:
     std::vector<float*> sortingSteps;
+    std::vector<std::array<std::string, 1000> > namesSortingSteps;
     size_t currentStep;
     float* copyFloatPointer(float* rhs);
 public:
