@@ -8,7 +8,7 @@ private:
 public:
 	MergeSort(std::array<std::pair<std::string, int>, 1000> arr) {
 		sortingSteps.push_back(arr);
-		merge_sort(arr, 0, 1000);
+		merge_sort(arr, 0, 999);
 	}
 };
 
@@ -16,8 +16,8 @@ void MergeSort::merge(std::array<std::pair<std::string, int>, 1000> arr, int lef
 	int arr_1 = mid - left + 1;
 	int arr_2 = right - mid;
 	
-	std::array<std::pair<std::string, int>, 1000> left_arr;
-	std::array<std::pair<std::string, int>, 1000> right_arr;
+	std::pair<std::string, int> left_arr[arr_1];
+	std::pair<std::string, int> right_arr[arr_2];
 	
 	for (int i = 0; i < arr_1; ++i) {
 		left_arr[i] = arr[left + i];

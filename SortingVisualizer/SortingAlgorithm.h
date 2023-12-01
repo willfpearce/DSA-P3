@@ -7,11 +7,12 @@
 
 class SortingAlgorithm {
 protected:
-    std::vector<std::array<std::pair<std::string, int>, 1000>> sortingSteps;
+    std::vector<float*> sortingSteps;
     size_t currentStep;
+    float* copyFloatPointer(float* rhs);
 public:
-    std::array<std::pair<std::string, int>, 1000> getNextStep();
-    std::array<std::pair<std::string, int>, 1000> getPreviousStep();
+    float* getNextStep();
+    float* getPreviousStep();
     bool areNoStepsRemaining();
-    std::array<std::pair<std::string, int>, 1000> getSorted();
+    float* getSorted();
 };
