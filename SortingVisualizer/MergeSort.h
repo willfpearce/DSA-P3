@@ -3,16 +3,16 @@
 
 class MergeSort : public SortingAlgorithm {
 private:
-	void merge(std::array<std::pair<std::string, int>, 1000> arr, int left, int mid, int right);
-	void merge_sort(std::array<std::pair<std::string, int>, 1000> arr, int left, int right);
+	void merge(std::array<std::pair<std::string, int>, 1000> &arr, int left, int mid, int right);
+	void merge_sort(std::array<std::pair<std::string, int>, 1000> &arr, int left, int right);
 public:
-	MergeSort(std::array<std::pair<std::string, int>, 1000> arr) {
+	MergeSort(std::array<std::pair<std::string, int>, 1000> &arr) {
 		sortingSteps.push_back(arr);
 		merge_sort(arr, 0, 999);
 	}
 };
 
-void MergeSort::merge(std::array<std::pair<std::string, int>, 1000> arr, int left, int mid, int right) {
+void MergeSort::merge(std::array<std::pair<std::string, int>, 1000> &arr, int left, int mid, int right) {
 	int arr_1 = mid - left + 1;
 	int arr_2 = right - mid;
 	
@@ -60,7 +60,7 @@ void MergeSort::merge(std::array<std::pair<std::string, int>, 1000> arr, int lef
 	
 }
 
-void MergeSort::merge_sort(std::array<std::pair<std::string, int>, 1000> arr, int left, int right) {
+void MergeSort::merge_sort(std::array<std::pair<std::string, int>, 1000> &arr, int left, int right) {
 	if (left < right) {
 		int mid = left + (right - left) / 2;
 		merge_sort(arr, left, mid);
