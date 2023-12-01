@@ -1,10 +1,10 @@
 #include "SortingAlgorithm.h"
 
-std::array<std::pair<std::string, int>, 1000> SortingAlgorithm::getNextStep() {
+float* SortingAlgorithm::getNextStep() {
     return sortingSteps[++currentStep];
 }
 
-std::array<std::pair<std::string, int>, 1000> SortingAlgorithm::getPreviousStep() {
+float* SortingAlgorithm::getPreviousStep() {
     return sortingSteps[--currentStep];
 }
 
@@ -12,6 +12,14 @@ bool SortingAlgorithm::areNoStepsRemaining() {
     return currentStep == sortingSteps.size() - 1;
 }
 
-std::array<std::pair<std::string, int>, 1000> SortingAlgorithm::getSorted() {
+float* SortingAlgorithm::getSorted() {
     return sortingSteps.back();
+}
+
+float* SortingAlgorithm::copyFloatPointer(float *rhs) {
+    int size = 1000;
+    float* copy = new float[size];
+    for (int i = 0; i < size; i++) {
+        copy[i] = rhs[i];
+    }
 }
