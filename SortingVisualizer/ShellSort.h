@@ -3,9 +3,10 @@
 
 class ShellSort : public SortingAlgorithm {
 private:
-    void swap(std::array<std::pair<std::string, int>, 1000>& arr, size_t i, size_t j);
-    void modifiedInsSort(std::array<std::pair<std::string, int>, 1000> &arr, size_t start, size_t incr);
+    void swap(float* pops, size_t i, size_t j);
+    void swap(std::array<std::string, 1000> names, size_t i, size_t j);
+    void modifiedInsSort(float* pops, std::array<std::string, 1000> names, size_t start, size_t incr);
 public:
-    ShellSort(std::array<std::pair<std::string, int>, 1000>);
+    ShellSort(float* pops, std::array<std::string, 1000> names);
 
 };
