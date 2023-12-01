@@ -23,3 +23,7 @@ float* SortingAlgorithm::copyFloatPointer(float *rhs) {
         copy[i] = rhs[i];
     }
 }
+
+void SortingAlgorithm::reset() {
+    currentStep = 0;
+}

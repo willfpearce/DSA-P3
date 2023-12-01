@@ -16,4 +16,5 @@ public:
     float* getPreviousStep();
     bool areNoStepsRemaining();
     float* getSorted();
+    void reset();
 };

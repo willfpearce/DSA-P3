@@ -1,6 +1,7 @@
 #pragma once
 
 #include <future>
+#include <unordered_map>
 #include "imgui.h"
 #include "params.h"
 #include "SortingAlgorithm.h"
@@ -34,9 +35,11 @@ private:
     int paused = true;
 
     std::future<SortingAlgorithm> currentAlgoFuture;
+    std::unordered_map<std::string, SortingAlgorithm> createdAlgos;
 
-    SortingAlgorithm asyncChangeAlgoTask(const char* type);
     void ChangeAlgo();
+    SortingAlgorithm asyncChangeAlgoTask(const char* state, const char* type);
+    std::pair<float*, std::array<std::string, 1000> > loadStateData(const char* stateName);
 
 public:
     UseImgui(Params params);

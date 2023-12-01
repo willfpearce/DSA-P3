@@ -3,6 +3,7 @@
 #include <array>
 #include <utility>
 #include <chrono>
+#include <fstream>
 
 #include "UseImgui.h"
 #include "imgui_impl_dx9.h"
@@ -37,17 +38,49 @@ float* generateFloatData() {
     return data;
 };
 
+std::pair<float*, std::array<std::string, 1000> > UseImgui::loadStateData(const char* stateName) {
+    std::string strStateName(stateName);
+    std::ifstream stream("./resources/states/" + strStateName + ".txt");
+
+    float* pops = new float[1000];
+    std::array<std::string, 1000> names;
+    std::string line;
+    for (int i = 0; i < 1000; i++) {
+        std::getline(stream, line);
+        pops[i] = (float)stoi(line);
+    }
+    for (int i = 0; i < 1000; i++) {
+        std::getline(stream, line);
+        names[i] = line;
+    }
+    return std::make_pair(pops, names);
+}
+
 // needs to be updated
-SortingAlgorithm UseImgui::asyncChangeAlgoTask(const char* type) {
+SortingAlgorithm UseImgui::asyncChangeAlgoTask(const char* state, const char* type) {
+    // check created algorithms map to determine if state/algo type combo already loaded
+    std::string key = std::string(state) + type;
+    if (createdAlgos.count(key) != 0) {
+        createdAlgos[key].reset();
+        return createdAlgos[key];
+    }
+
+    std::pair<float*, std::array<std::string, 1000> > stateData = loadStateData(state);
+    SortingAlgorithm newAlgo;
     switch ((int)*type) {
         case (int) *"Merge Sort":
             // TODO implement merge sort
-            return QuickSort(generateData());
+            newAlgo = QuickSort(stateData.first, stateData.second);
+            break;
         case (int) *"Shell Sort":
-            return ShellSort(generateData());
+            newAlgo = ShellSort(stateData.first, stateData.second);
+            break;
         case (int) *"Quick Sort":
-            return QuickSort(generateData());
+            newAlgo =  QuickSort(stateData.first, stateData.second);
+            break;
     }
+    createdAlgos[key] = newAlgo;
+    return newAlgo;
 }
 
 UseImgui::UseImgui(Params params) : params(params) {
@@ -68,7 +101,7 @@ UseImgui::UseImgui(Params params) : params(params) {
     ImGui_ImplWin32_Init(params.hwnd);
     ImGui_ImplDX9_Init(params.g_pd3dDevice);
 
-    currentAlgoFuture = std::async(std::launch::async, &UseImgui::asyncChangeAlgoTask, this, "Quick Sort");
+    currentAlgoFuture = std::async(std::launch::async, &UseImgui::asyncChangeAlgoTask, this, "Alabama", "Quick Sort");
 }
 
 
@@ -106,7 +139,7 @@ void UseImgui::Update(bool& done) {
 // TODO create a map of structure pair<state, algorithmType> : SortingAlgorithm in order to not recreate already stored objects
 // TODO link this function to generated data for states (currently uses random data)
 void UseImgui::ChangeAlgo() {
-    currentAlgoFuture = std::async(std::launch::async, &UseImgui::asyncChangeAlgoTask, this, currentAlgoType);
+    currentAlgoFuture = std::async(std::launch::async, &UseImgui::asyncChangeAlgoTask, this, currentState, currentAlgoType);
 }
 
 void UseImgui::Render() {
