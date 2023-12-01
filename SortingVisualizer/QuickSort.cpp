@@ -52,6 +52,6 @@ void QuickSort::Swap(float* input, std::array<std::string, 1000> &names, int fir
 }
 
 void QuickSort::Update(float* input, const std::array<std::string, 1000>& names) { //Creates a copy of the current state of the data being sorted and adds it to the steps.
-    sortingSteps.push_back(CopyFloatPointer(input));
-    stepNames.push_back(names);
+    sortingSteps.push_back(copyFloatPointer(input));
+    namesSortingSteps.push_back(names);
 }
