@@ -1,11 +1,14 @@
 #include "../SortingVisualizer/QuickSort.h"
 #include "../SortingVisualizer/ShellSort.h"
-//#include "../SortingVisualizer/MergeSort.h"
+#include "../SortingVisualizer/MergeSort.h"
 #include <random>
 #include <algorithm>
 #include <iostream>
 
 #define SIZE 1000
+
+// NOTE: This test is outdated, it no longer works due to changes to the function signatures in the SortingAlgorithm classes
+// We used this for testing our algorithms in the early stage and it was useful
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -43,10 +46,10 @@ int main() {
 
     QuickSort qs(randomData);
     ShellSort ss(randomData);
-//    MergeSort ms(randomData);
+    MergeSort ms(randomData);
 
     test("QuickSort", qs.getSorted(), sortedRandomData);
     test("ShellSort", ss.getSorted(), sortedRandomData);
-//    test("MergeSort", ms.getSorted(), sortedRandomData);
+    test("MergeSort", ms.getSorted(), sortedRandomData);
 
 }
