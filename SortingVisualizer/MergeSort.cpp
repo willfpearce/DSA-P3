@@ -33,6 +33,7 @@ void MergeSort::merge(float* pops, std::array<std::string, 1000> &names, int lef
 			++index_arr_2;;
 		}
 		++index_merged_arr;
+		++swapCount;
 	}
 	
 	while (index_arr_1 < arr_1) {
@@ -40,6 +41,7 @@ void MergeSort::merge(float* pops, std::array<std::string, 1000> &names, int lef
 		pops[index_merged_arr] = left_arr[index_arr_1].second;
 		++index_arr_1;
 		++index_merged_arr;
+		++swapCount;
 	}
 
 	while (index_arr_2 < arr_2) {
@@ -47,6 +49,7 @@ void MergeSort::merge(float* pops, std::array<std::string, 1000> &names, int lef
 		pops[index_merged_arr] = right_arr[index_arr_2].second;
 		++index_arr_2;
 		++index_merged_arr;
+		++swapCount;
 	}
 
 	auto copy = copyFloatPointer(pops);
@@ -66,10 +69,13 @@ void MergeSort::merge_sort(float* pops, std::array<std::string, 1000> &names, in
 }
 
 MergeSort::MergeSort(float* pops, std::array<std::string, 1000> &names) {
-		auto copy = copyFloatPointer(pops);
-		sortingSteps.push_back(copy);
-		auto copy_2 = names;
-		namesSortingSteps.push_back(copy_2);
-		merge_sort(pops, names, 0, 999);
+	auto copy = copyFloatPointer(pops);
+	sortingSteps.push_back(copy);
+	auto copy_2 = names;
+	namesSortingSteps.push_back(copy_2);
+	std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+	merge_sort(pops, names, 0, 999);
+	std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+	sortTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 }
 
