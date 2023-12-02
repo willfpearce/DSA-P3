@@ -293,6 +293,12 @@ void UseImgui::Render() {
                 if (pos > 999) pos = 999;
                 ImGui::SetTooltip("%s\nPop: %.0f", currentNamesData[pos].c_str(), currentPlotData[pos]);
             }
+
+            // Analysis section
+            ImGui::SeparatorText("Analysis");
+            ImGui::Text("System Time Elapsed: %d ms", currentAlgo->getSortTime().count());
+            ImGui::Text("Number of Swaps: %d", currentAlgo->getSwapCount());
+
         } else {
             ImGui::Text("Loading...");
         }
