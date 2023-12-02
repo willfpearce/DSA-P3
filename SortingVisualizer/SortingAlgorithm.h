@@ -2,6 +2,7 @@
 #include <utility>
 #include <vector>
 #include <string>
+#include <chrono>
 
 #pragma once
 
@@ -11,6 +12,9 @@ protected:
     std::vector<std::array<std::string, 1000> > namesSortingSteps;
     int currentStep = -1;
     float* copyFloatPointer(float* rhs);
+    int swapCount = 0;
+    std::chrono::duration<int,std::milli> sortTime;
+
 public:
     std::pair<float*, std::array<std::string, 1000> > getNextStep();
     std::pair<float*, std::array<std::string, 1000> > getPreviousStep();
@@ -18,5 +22,9 @@ public:
     bool isAtStart();
     std::pair<float*, std::array<std::string, 1000> > getSorted();
     void reset();
+    int getSwapCount();
+    std::chrono::duration<int,std::milli> getSortTime();
+
+
     ~SortingAlgorithm();
 };

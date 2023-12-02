@@ -39,3 +39,11 @@ SortingAlgorithm::~SortingAlgorithm(){
         delete item;
     }
 }
+
+int SortingAlgorithm::getSwapCount() {
+    return swapCount;
+}
+
+std::chrono::duration<int, std::milli> SortingAlgorithm::getSortTime() {
+    return sortTime;
+}
