@@ -40,30 +40,29 @@ std::pair<float*, std::array<std::string, 1000> > UseImgui::loadStateData(const 
 }
 
 // needs to be updated
-SortingAlgorithm UseImgui::asyncChangeAlgoTask(const char* state, const char* type) {
+SortingAlgorithm* UseImgui::asyncChangeAlgoTask(const char* state, const char* type) {
     // check created algorithms map to determine if state/algo type combo already loaded
     std::string key = std::string(state) + type;
     if (createdAlgos.count(key) != 0) {
-        createdAlgos[key].reset();
+        createdAlgos[key]->reset();
         return createdAlgos[key];
     }
 
     std::pair<float*, std::array<std::string, 1000> > stateData = loadStateData(state);
-    SortingAlgorithm newAlgo;
     switch ((int)*type) {
         case (int) *"Merge Sort":
             // TODO implement merge sort
-            newAlgo = MergeSort(stateData.first, stateData.second);
+            newAlgo = new MergeSort(stateData.first, stateData.second);
             break;
         case (int) *"Shell Sort":
-            newAlgo = ShellSort(stateData.first, stateData.second);
+            newAlgo = new ShellSort(stateData.first, stateData.second);
             break;
         case (int) *"Quick Sort":
-            newAlgo =  QuickSort(stateData.first, stateData.second);
+            newAlgo = new QuickSort(stateData.first, stateData.second);
             break;
     }
     createdAlgos[key] = newAlgo;
-    auto stepData = newAlgo.getNextStep();
+    auto stepData = newAlgo->getNextStep();
 
 
     currentPlotData = stepData.first;
@@ -131,18 +130,18 @@ void UseImgui::ChangeAlgo() {
 }
 
 void UseImgui::stepForward() {
-    if (!loading && !currentAlgo.areNoStepsRemaining())
+    if (!loading && !currentAlgo->areNoStepsRemaining())
     {
-        auto stepData = currentAlgo.getNextStep();
+        auto stepData = currentAlgo->getNextStep();
         currentPlotData = stepData.first;
         currentNamesData = stepData.second;
     }
 }
 
 void UseImgui::stepBack() {
-    if (!loading && !currentAlgo.isAtStart())
+    if (!loading && !currentAlgo->isAtStart())
     {
-        auto stepData = currentAlgo.getPreviousStep();
+        auto stepData = currentAlgo->getPreviousStep();
         currentPlotData = stepData.first;
         currentNamesData = stepData.second;
     }
@@ -242,7 +241,7 @@ void UseImgui::Render() {
         if (ImGui::Button("Reset")) {
             mode = PAUSED;
             if (!loading) {
-                currentAlgo.reset();
+                currentAlgo->reset();
                 stepForward();
             }
         }
@@ -328,6 +327,9 @@ UseImgui::~UseImgui() {
     ImGui_ImplDX9_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
+    for (auto it = createdAlgos.begin(); it != createdAlgos.end(); ++it) {
+        delete it->second;
+    }
 }
 
 void UseImgui::ResetDevice()

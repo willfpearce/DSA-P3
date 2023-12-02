@@ -41,12 +41,13 @@ private:
     float* currentPlotData;
     std::array<std::string, 1000> currentNamesData;
 
-    std::future<SortingAlgorithm> currentAlgoFuture;
-    SortingAlgorithm currentAlgo;
-    std::unordered_map<std::string, SortingAlgorithm> createdAlgos;
+    std::future<SortingAlgorithm*> currentAlgoFuture;
+    SortingAlgorithm* currentAlgo;
+    std::unordered_map<std::string, SortingAlgorithm*> createdAlgos;
+    SortingAlgorithm* newAlgo;
 
     void ChangeAlgo();
-    SortingAlgorithm asyncChangeAlgoTask(const char* state, const char* type);
+    SortingAlgorithm* asyncChangeAlgoTask(const char* state, const char* type);
     std::pair<float*, std::array<std::string, 1000> > loadStateData(const char* stateName);
 
     void stepForward();
