@@ -51,7 +51,8 @@ void MergeSort::merge(float* pops, std::array<std::string, 1000> &names, int lef
 
 	auto copy = copyFloatPointer(pops);
 	sortingSteps.push_back(copy);
-	push(names);
+	auto copy_2 = names;
+	namesSortingSteps.push_back(copy_2);
 	
 }
 
@@ -64,14 +65,11 @@ void MergeSort::merge_sort(float* pops, std::array<std::string, 1000> &names, in
 	}
 }
 
-void MergeSort::push(std::array<std::string, 1000> names) {
-	namesSortingSteps.push_back(names);
-}
-
 MergeSort::MergeSort(float* pops, std::array<std::string, 1000> &names) {
 		auto copy = copyFloatPointer(pops);
 		sortingSteps.push_back(copy);
-		push(names);
+		auto copy_2 = names;
+		namesSortingSteps.push_back(copy_2);
 		merge_sort(pops, names, 0, 999);
 }
 
