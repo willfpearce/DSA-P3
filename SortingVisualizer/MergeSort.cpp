@@ -22,7 +22,7 @@ void MergeSort::merge(float* pops, std::array<std::string, 1000> &names, int lef
 	int index_merged_arr = left;
 
 	while (index_arr_1 < arr_1 && index_arr_2 < arr_2) {
-		if (left_arr[index_arr_1] <= right_arr[index_arr_2]) {
+		if (left_arr[index_arr_1].second <= right_arr[index_arr_2].second) {
 			names[index_merged_arr] = left_arr[index_arr_1].first;
 			pops[index_merged_arr] = left_arr[index_arr_1].second;
 			++index_arr_1;
