@@ -52,6 +52,7 @@ void MergeSort::merge(float* pops, std::array<std::string, 1000> &names, int lef
 	
 	auto copy = copyFloatPointer(pops);
 	sortingSteps.push_back(copy);
+	namesSortingSteps.push_back(names);
 	
 }
 
