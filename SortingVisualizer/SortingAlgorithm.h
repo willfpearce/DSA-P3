@@ -18,5 +18,4 @@ public:
     bool isAtStart();
     std::pair<float*, std::array<std::string, 1000> > getSorted();
     void reset();
-    ~SortingAlgorithm();
 };

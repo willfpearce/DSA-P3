@@ -33,9 +33,3 @@ float* SortingAlgorithm::copyFloatPointer(float *rhs) {
 void SortingAlgorithm::reset() {
     currentStep = -1;
 }
-
-SortingAlgorithm::~SortingAlgorithm() {
-    for (auto step: sortingSteps) {
-        delete step;
-    }
-}
