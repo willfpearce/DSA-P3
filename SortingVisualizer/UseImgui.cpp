@@ -8,9 +8,10 @@
 #include "UseImgui.h"
 #include "imgui_impl_dx9.h"
 #include "imgui_impl_win32.h"
-//#include "MergeSort.h"
+#include "MergeSort.h"
 #include "QuickSort.h"
 #include "ShellSort.h"
+#include "imgui_internal.h"
 
 std::random_device rd;
 std::mt19937 gen(rd());
@@ -52,7 +53,7 @@ SortingAlgorithm UseImgui::asyncChangeAlgoTask(const char* state, const char* ty
     switch ((int)*type) {
         case (int) *"Merge Sort":
             // TODO implement merge sort
-            newAlgo = QuickSort(stateData.first, stateData.second);
+            newAlgo = MergeSort(stateData.first, stateData.second);
             break;
         case (int) *"Shell Sort":
             newAlgo = ShellSort(stateData.first, stateData.second);
@@ -67,7 +68,7 @@ SortingAlgorithm UseImgui::asyncChangeAlgoTask(const char* state, const char* ty
 
     currentPlotData = stepData.first;
     currentNamesData = stepData.second;
-    paused = true;
+    mode = PAUSED;
     return newAlgo;
 }
 
@@ -89,7 +90,7 @@ UseImgui::UseImgui(Params params) : params(params) {
     ImGui_ImplWin32_Init(params.hwnd);
     ImGui_ImplDX9_Init(params.g_pd3dDevice);
 
-    currentAlgoFuture = std::async(std::launch::async, &UseImgui::asyncChangeAlgoTask, this, "Alabama", "Quick Sort");
+    currentAlgoFuture = std::async(std::launch::async, &UseImgui::asyncChangeAlgoTask, this, "Alabama", "Merge Sort");
 }
 
 
@@ -159,7 +160,7 @@ void UseImgui::Render() {
         ImGui::SetNextWindowSize(io->DisplaySize);
         ImGui::SetNextWindowPos({0, 0});
 
-        ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar;
+        ImGuiWindowFlags windowFlags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize;
         ImGui::Begin("Options", nullptr, windowFlags); // Create a window called "Options" and append into it.
 
         // Title
@@ -210,27 +211,51 @@ void UseImgui::Render() {
 
         ImGui::SameLine(0, 25);
         if (ImGui::Button("<- Step")) {
-            paused = true;
+            mode = PAUSED;
             stepBack();
         }
 
         ImGui::SameLine(0, 6);
-        if (ImGui::Button("Pause")) {
-            paused = !paused;
-            if(!paused){
+        if (ImGui::Button(mode == PAUSED ? "Play" : "Pause")) {
+            mode = mode == PAUSED ? PLAYING : PAUSED;
+            if(mode != PAUSED){
                 lastStepTime = std::chrono::system_clock::now();
             }
-            std::cout << (paused ? "Paused!" : "Now Playing!") << "\n";
         }
 
         ImGui::SameLine(0, 6);
         if (ImGui::Button("Step ->")) {
-            paused = true;
+            mode = PAUSED;
             stepForward();
         }
 
+        ImGui::SameLine(0, 6);
+        if (ImGui::Button("Reverse")) {
+            if(mode != REVERSE) {
+                mode = REVERSE;
+            } else {
+                mode = PAUSED;
+            }
+        }
+
+        ImGui::SameLine(0, 6);
+        if (ImGui::Button("Reset")) {
+            mode = PAUSED;
+            if (!loading) {
+                currentAlgo.reset();
+                stepForward();
+            }
+        }
+
         ImGui::SameLine(0, 10);
-        ImGui::Text(paused ? "Mode: Paused" : "Mode: Playing");
+        if (mode == PAUSED)
+            ImGui::Text("Mode: Paused");
+        else if (mode == PLAYING)
+            ImGui::Text("Mode: Playing");
+        else
+            ImGui::Text("Mode: Reverse");
+
+
 
         // create visualization
         ImGui::InvisibleButton("padding", {5, 5}); // padding
@@ -242,11 +267,15 @@ void UseImgui::Render() {
                 loading = false;
                 currentAlgo = currentAlgoFuture.get();
             }
-            if(!paused){
+            if(mode != PAUSED){
                 std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
                 std::chrono::seconds oneSecond(1);
                 if(now >= (lastStepTime + (oneSecond / (stepSpeed * 2)))){
-                    stepForward();
+                    if(mode != REVERSE){
+                        stepForward();
+                    } else {
+                        stepBack();
+                    }
                     lastStepTime = std::chrono::system_clock::now();
                 }
             }
@@ -255,7 +284,16 @@ void UseImgui::Render() {
             const float scaleMin = 10000.0f;
             const float scaleMax = 1000000.0f;
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.99);
+            ImGui::PushStyleColor(ImGuiCol_PlotLines, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
             ImGui::PlotHistogram("", currentPlotData, 1000, 0, nullptr, scaleMin, scaleMax, {0.0f, 575.0f});
+            ImGui::PopStyleColor(2);
+            if (ImGui::IsItemHovered()) {
+                int pos = (int)((io->MousePos.x - 12) / 1231 * 1000 + 1);
+                if (pos < 0) pos = 0;
+                if (pos > 999) pos = 999;
+                ImGui::SetTooltip("%s\nPop: %.0f", currentNamesData[pos].c_str(), currentPlotData[pos]);
+            }
         } else {
             ImGui::Text("Loading...");
         }
