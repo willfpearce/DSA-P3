@@ -1,5 +1,6 @@
 cmake-build-debug/
 .idea/
+imgui.ini
 
 # Prerequisites
 *.d
