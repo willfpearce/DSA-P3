@@ -1,19 +1,23 @@
 #include "SortingAlgorithm.h"
 
-float* SortingAlgorithm::getNextStep() {
-    return sortingSteps[++currentStep];
+std::pair<float*, std::array<std::string, 1000> > SortingAlgorithm::getNextStep() {
+    return {sortingSteps[++currentStep], namesSortingSteps[currentStep]};
 }
 
-float* SortingAlgorithm::getPreviousStep() {
-    return sortingSteps[--currentStep];
+std::pair<float*, std::array<std::string, 1000> > SortingAlgorithm::getPreviousStep() {
+    return {sortingSteps[--currentStep], namesSortingSteps[currentStep]};
 }
 
 bool SortingAlgorithm::areNoStepsRemaining() {
     return currentStep == sortingSteps.size() - 1;
 }
 
-float* SortingAlgorithm::getSorted() {
-    return sortingSteps.back();
+bool SortingAlgorithm::isAtStart() {
+    return currentStep <= 0;
+}
+
+std::pair<float*, std::array<std::string, 1000> > SortingAlgorithm::getSorted() {
+    return {sortingSteps[999], namesSortingSteps[999]};
 }
 
 float* SortingAlgorithm::copyFloatPointer(float *rhs) {
@@ -25,5 +29,5 @@ float* SortingAlgorithm::copyFloatPointer(float *rhs) {
 }
 
 void SortingAlgorithm::reset() {
-    currentStep = 0;
+    currentStep = -1;
 }

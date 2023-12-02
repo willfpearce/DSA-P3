@@ -9,12 +9,13 @@ class SortingAlgorithm {
 protected:
     std::vector<float*> sortingSteps;
     std::vector<std::array<std::string, 1000> > namesSortingSteps;
-    size_t currentStep;
+    size_t currentStep = -1;
     float* copyFloatPointer(float* rhs);
 public:
-    float* getNextStep();
-    float* getPreviousStep();
+    std::pair<float*, std::array<std::string, 1000> > getNextStep();
+    std::pair<float*, std::array<std::string, 1000> > getPreviousStep();
     bool areNoStepsRemaining();
-    float* getSorted();
+    bool isAtStart();
+    std::pair<float*, std::array<std::string, 1000> > getSorted();
     void reset();
 };
