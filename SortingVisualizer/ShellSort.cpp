@@ -3,6 +3,7 @@
 
 // swap values and add changed array to sortingSteps vector
 void ShellSort::swap(float* pops, size_t i, size_t j) {
+    swapCount++;
     auto temp = pops[i];
     pops[i] = pops[j];
     pops[j] = temp;
@@ -28,8 +29,9 @@ void ShellSort::modifiedInsSort(float* pops, std::array<std::string, 1000> names
         }
 }
 
-// TODO: passed by ref, subject to change
+
 ShellSort::ShellSort(float* pops, std::array<std::string, 1000> names) {
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
     auto copy = copyFloatPointer(pops);
     sortingSteps.push_back(copy);
 
@@ -39,4 +41,6 @@ ShellSort::ShellSort(float* pops, std::array<std::string, 1000> names) {
             modifiedInsSort(pops, names, j, i);
     modifiedInsSort(pops, names, 0, 1);
 
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+    sortTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 }

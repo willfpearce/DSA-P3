@@ -3,8 +3,11 @@
 //Sorting code structure borrowed from module 6 lecture slides
 
 QuickSort::QuickSort(float* input, std::array<std::string, 1000> names) {
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
     Update(input, names); //Records initial state of array
     Sort(input, names, 0, 999); //Preforms quick sort
+    std::chrono::system_clock::time_point end = std::chrono::system_clock::now();
+    sortTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
 }
 
 void QuickSort::Sort(float *input, std::array<std::string, 1000> &names, int low, int high) {
@@ -41,6 +44,7 @@ int QuickSort::Partition(float* input, std::array<std::string, 1000> &names, int
 }
 
 void QuickSort::Swap(float* input, std::array<std::string, 1000> &names, int first, int second) { //Swaps two indices of the array
+    swapCount++;
     float temp = input[first];
     std::string tempStr = names[first];
     input[first] = input[second];
