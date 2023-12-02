@@ -32,7 +32,8 @@ private:
     int stepSpeed = 3;
     const int minSpeed = 1;
     const int maxSpeed = 5;
-    int paused = true;
+    enum PlayingMode {PAUSED, PLAYING, REVERSE};
+    PlayingMode mode = PAUSED;
     bool loading = true;
 
     std::chrono::system_clock::time_point lastStepTime;
