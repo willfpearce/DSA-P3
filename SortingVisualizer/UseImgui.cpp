@@ -20,24 +20,6 @@ int getRandom(int low, int high){
     return distribution(gen);
 }
 
-// TODO remove this function
-std::array<std::pair<std::string, int>, 1000> generateData(){
-    std::array<std::pair<std::string, int>, 1000> data;
-    for(int i = 0; i < 1000; i++){
-        data[i] = std::make_pair("", getRandom(1, 10000));
-    }
-    return data;
-};
-
-// TODO remove this function
-float* generateFloatData() {
-    auto data = new float[1000];
-    for(int i = 0; i < 1000; i++){
-        data[i] = (float)getRandom(1, 10000);
-    }
-    return data;
-};
-
 std::pair<float*, std::array<std::string, 1000> > UseImgui::loadStateData(const char* stateName) {
     std::string strStateName(stateName);
     std::ifstream stream("./resources/states/" + strStateName + ".txt");
@@ -80,6 +62,12 @@ SortingAlgorithm UseImgui::asyncChangeAlgoTask(const char* state, const char* ty
             break;
     }
     createdAlgos[key] = newAlgo;
+    auto stepData = newAlgo.getNextStep();
+
+
+    currentPlotData = stepData.first;
+    currentNamesData = stepData.second;
+    paused = true;
     return newAlgo;
 }
 
@@ -136,10 +124,27 @@ void UseImgui::Update(bool& done) {
 
 // called every time the state or sorting algorithm is changed
 // runs the SortingAlgorithm constructors asynchronously
-// TODO create a map of structure pair<state, algorithmType> : SortingAlgorithm in order to not recreate already stored objects
-// TODO link this function to generated data for states (currently uses random data)
 void UseImgui::ChangeAlgo() {
+    loading = true;
     currentAlgoFuture = std::async(std::launch::async, &UseImgui::asyncChangeAlgoTask, this, currentState, currentAlgoType);
+}
+
+void UseImgui::stepForward() {
+    if (!loading && !currentAlgo.areNoStepsRemaining())
+    {
+        auto stepData = currentAlgo.getNextStep();
+        currentPlotData = stepData.first;
+        currentNamesData = stepData.second;
+    }
+}
+
+void UseImgui::stepBack() {
+    if (!loading && !currentAlgo.isAtStart())
+    {
+        auto stepData = currentAlgo.getPreviousStep();
+        currentPlotData = stepData.first;
+        currentNamesData = stepData.second;
+    }
 }
 
 void UseImgui::Render() {
@@ -151,8 +156,6 @@ void UseImgui::Render() {
     // Create options window
     {
         // TODO: we need to create a system for updating the sorting visualizer iff the step time has elapsed
-        // TODO: we need to create a system for changing the visualization if the state or sorting algorithm is changed
-        // TODO -------- EDIT: functions exist but now they need to be linked to states data
         // TODO: create pause functionality
 
         // set options window to max width and height
@@ -209,16 +212,25 @@ void UseImgui::Render() {
         ImGui::SliderInt("Step Speed", &stepSpeed, minSpeed, maxSpeed);
 
         ImGui::SameLine(0, 25);
-        if (ImGui::Button("<- Step")) 0;
-//            TODO step back here
+        if (ImGui::Button("<- Step")) {
+            paused = true;
+            stepBack();
+        }
+
         ImGui::SameLine(0, 6);
         if (ImGui::Button("Pause")) {
             paused = !paused;
+            if(!paused){
+                lastStepTime = std::chrono::system_clock::now();
+            }
             std::cout << (paused ? "Paused!" : "Now Playing!") << "\n";
         }
+
         ImGui::SameLine(0, 6);
-        if (ImGui::Button("Step ->")) 0;
-//            TODO step forward here
+        if (ImGui::Button("Step ->")) {
+            paused = true;
+            stepForward();
+        }
 
         ImGui::SameLine(0, 10);
         ImGui::Text(paused ? "Mode: Paused" : "Mode: Playing");
@@ -228,15 +240,25 @@ void UseImgui::Render() {
         ImGui::SeparatorText("Visualization"); // Title
 
         // visualization only displays when sorting algorithm future has a valid result
-        if (currentAlgoFuture.valid() && currentAlgoFuture.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready) {
-            // TODO switch data with SortingAlgorithmData
-            // minor memory leak here
-            static float *data = generateFloatData();
-            // these variables represent the lowest and highest values of the population so they'll change when we figure out how we're generating the data
-            const float scaleMin = 0.0f;
-            const float scaleMax = 10000.0f;
+        if (!loading || (currentAlgoFuture.valid() && currentAlgoFuture.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready)) {
+            if (loading) {
+                loading = false;
+                currentAlgo = currentAlgoFuture.get();
+            }
+            if(!paused){
+                std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+                std::chrono::seconds oneSecond(1);
+                if(now >= (lastStepTime + (oneSecond / (stepSpeed * 2)))){
+                    stepForward();
+                    lastStepTime = std::chrono::system_clock::now();
+                }
+            }
+
+            // these variables represent the lowest and highest values of the population, so they'll change when we figure out how we're generating the data
+            const float scaleMin = 10000.0f;
+            const float scaleMax = 1000000.0f;
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.99);
-            ImGui::PlotHistogram("", data, 1000, 0, nullptr, scaleMin, scaleMax, {0.0f, 575.0f});
+            ImGui::PlotHistogram("", currentPlotData, 1000, 0, nullptr, scaleMin, scaleMax, {0.0f, 575.0f});
         } else {
             ImGui::Text("Loading...");
         }

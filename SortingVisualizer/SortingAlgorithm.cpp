@@ -1,4 +1,5 @@
 #include "SortingAlgorithm.h"
+#include <iostream>
 
 std::pair<float*, std::array<std::string, 1000> > SortingAlgorithm::getNextStep() {
     return {sortingSteps[++currentStep], namesSortingSteps[currentStep]};
@@ -26,6 +27,7 @@ float* SortingAlgorithm::copyFloatPointer(float *rhs) {
     for (int i = 0; i < size; i++) {
         copy[i] = rhs[i];
     }
+    return copy;
 }
 
 void SortingAlgorithm::reset() {

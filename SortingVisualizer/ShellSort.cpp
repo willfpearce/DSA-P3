@@ -38,4 +38,5 @@ ShellSort::ShellSort(float* pops, std::array<std::string, 1000> names) {
         for (size_t j = 0; j < i; j++)  //Sort each sublist
             modifiedInsSort(pops, names, j, i);
     modifiedInsSort(pops, names, 0, 1);
+
 }

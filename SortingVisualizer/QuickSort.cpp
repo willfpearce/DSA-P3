@@ -2,8 +2,7 @@
 
 //Sorting code structure borrowed from module 6 lecture slides
 
-QuickSort::QuickSort(float input[1000], std::array<std::string, 1000> names) {
-    float* in = input;
+QuickSort::QuickSort(float* input, std::array<std::string, 1000> names) {
     Update(input, names); //Records initial state of array
     Sort(input, names, 0, 999); //Preforms quick sort
 }
