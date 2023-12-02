@@ -155,9 +155,6 @@ void UseImgui::Render() {
 
     // Create options window
     {
-        // TODO: we need to create a system for updating the sorting visualizer iff the step time has elapsed
-        // TODO: create pause functionality
-
         // set options window to max width and height
         ImGui::SetNextWindowSize(io->DisplaySize);
         ImGui::SetNextWindowPos({0, 0});
