@@ -1,5 +1,4 @@
 #include <iostream>
-#include <random>
 #include <array>
 #include <utility>
 #include <chrono>
@@ -13,13 +12,6 @@
 #include "ShellSort.h"
 #include "imgui_internal.h"
 
-std::random_device rd;
-std::mt19937 gen(rd());
-
-int getRandom(int low, int high){
-    std::uniform_int_distribution<int> distribution(low, high);
-    return distribution(gen);
-}
 
 std::pair<float*, std::array<std::string, 1000> > UseImgui::loadStateData(const char* stateName) {
     std::string strStateName(stateName);
