@@ -14,7 +14,7 @@
 
 ## Installation
 
-Git clone the repo onto your hard drive. Open the folder in CLion and build/run.
+Git clone the repo onto your hard drive. Make sure the working dirrectory is DSA-P3. Open the folder in CLion and build/run.
 
 ## To Contribute
 
