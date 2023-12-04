@@ -11,6 +11,7 @@ void ShellSort::swap(float* pops, size_t i, size_t j) {
     sortingSteps.push_back(copy);
 }
 
+// swap for names array
 void ShellSort::swap(std::array<std::string, 1000> names, size_t i, size_t j) {
     auto temp = names[i];
     names[i] = names[j];
@@ -29,15 +30,18 @@ void ShellSort::modifiedInsSort(float* pops, std::array<std::string, 1000> names
         }
 }
 
-
+// sorting is completed in the constructor so that the interacting with the class object allows
+// the user to analyze aspects of the algorithm
 ShellSort::ShellSort(float* pops, std::array<std::string, 1000> names) {
+    // measuring time of sort
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
     auto copy = copyFloatPointer(pops);
+    // here we add all sorting intermediate steps to this vector to be used in the visualization
     sortingSteps.push_back(copy);
 
     size_t size = 1000;
-    for (size_t i = size/2; i > 2; i /= 2.2)  //For each increment
-        for (size_t j = 0; j < i; j++)  //Sort each sublist
+    for (size_t i = size/2; i > 2; i /= 2.2)  // For each increment
+        for (size_t j = 0; j < i; j++)  // Sort each sublist
             modifiedInsSort(pops, names, j, i);
     modifiedInsSort(pops, names, 0, 1);
 

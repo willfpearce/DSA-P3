@@ -7,6 +7,7 @@
 #include <d3d9.h>
 #include <tchar.h>
 
+// Creates and initializes window
 class DX9Window {
 private:
     WNDCLASSEXW wc;

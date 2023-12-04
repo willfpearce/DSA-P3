@@ -16,13 +16,11 @@
 std::random_device rd;
 std::mt19937 gen(rd());
 
-int getRandom(int low, int high){
-    std::uniform_int_distribution<int> distribution(low, high);
-    return distribution(gen);
-}
-
+// loads state population and name data from its file
+// returns arrays of the population data and the names
 std::pair<float*, std::array<std::string, 1000> > UseImgui::loadStateData(const char* stateName) {
     std::string strStateName(stateName);
+    // opening the file for reading
     std::ifstream stream("./resources/states/" + strStateName + ".txt");
 
     float* pops = new float[1000];
@@ -39,15 +37,16 @@ std::pair<float*, std::array<std::string, 1000> > UseImgui::loadStateData(const 
     return std::make_pair(pops, names);
 }
 
-// needs to be updated
+// this is the function that runs on a separate thread when the state or algorithm is changed
 SortingAlgorithm* UseImgui::asyncChangeAlgoTask(const char* state, const char* type) {
     // check created algorithms map to determine if state/algo type combo already loaded
-    std::string key = std::string(state) + type;
-    if (createdAlgos.count(key) != 0) {
-        createdAlgos[key]->reset();
-        return createdAlgos[key];
+    std::string key = std::string(state) + type; // key for the map is just the state and algo type concatenated
+    if (createdAlgos.count(key) != 0) { // if algo exists in the map
+        createdAlgos[key]->reset(); // resets back to the first step of the sort
+        return createdAlgos[key]; // returns previously constructed algo instead of a new one
     }
 
+    // load from file
     std::pair<float*, std::array<std::string, 1000> > stateData = loadStateData(state);
     switch ((int)*type) {
         case (int) *"Merge Sort":
@@ -60,6 +59,9 @@ SortingAlgorithm* UseImgui::asyncChangeAlgoTask(const char* state, const char* t
         case (int) *"Quick Sort":
             newAlgo = new QuickSort(stateData.first, stateData.second);
             break;
+
+    // NOTE: algorithm objects are constructed on the heap to prevent their destructors from being called prematurely
+    // there are other ways to do this like the 'move' keyword
     }
     createdAlgos[key] = newAlgo;
     auto stepData = newAlgo->getNextStep();
@@ -77,18 +79,16 @@ UseImgui::UseImgui(Params params) : params(params) {
     ImGui::CreateContext();
     io = &ImGui::GetIO(); (void)io;
 
-    // could be unnecessary if keyboard unused but leaving it here for now
     io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
-    //ImGui::StyleColorsLight();
 
     // Setup Platform/Renderer backends
     ImGui_ImplWin32_Init(params.hwnd);
     ImGui_ImplDX9_Init(params.g_pd3dDevice);
 
+    // constructs default algorithm
     currentAlgoFuture = std::async(std::launch::async, &UseImgui::asyncChangeAlgoTask, this, "Alabama", "Merge Sort");
 }
 
@@ -147,6 +147,7 @@ void UseImgui::stepBack() {
     }
 }
 
+// Where all imgui rendering code is located, all logic for the sorting visualization and its parameters
 void UseImgui::Render() {
     // Start the Dear ImGui frame
     ImGui_ImplDX9_NewFrame();
@@ -208,35 +209,40 @@ void UseImgui::Render() {
         ImGui::SetNextItemWidth(250);
         ImGui::SliderInt("Step Speed", &stepSpeed, minSpeed, maxSpeed);
 
+        // Step back button
         ImGui::SameLine(0, 25);
         if (ImGui::Button("<- Step")) {
             mode = PAUSED;
             stepBack();
         }
 
+        // Pause/Play button
         ImGui::SameLine(0, 6);
         if (ImGui::Button(mode == PAUSED ? "Play" : "Pause")) {
             mode = mode == PAUSED ? PLAYING : PAUSED;
-            if(mode != PAUSED){
+            if (mode != PAUSED){
                 lastStepTime = std::chrono::system_clock::now();
             }
         }
 
+        // Step forward button
         ImGui::SameLine(0, 6);
         if (ImGui::Button("Step ->")) {
             mode = PAUSED;
             stepForward();
         }
 
+        // Reverse button
         ImGui::SameLine(0, 6);
         if (ImGui::Button("Reverse")) {
-            if(mode != REVERSE) {
+            if (mode != REVERSE) {
                 mode = REVERSE;
             } else {
                 mode = PAUSED;
             }
         }
 
+        // Reset visualization button
         ImGui::SameLine(0, 6);
         if (ImGui::Button("Reset")) {
             mode = PAUSED;
@@ -246,6 +252,7 @@ void UseImgui::Render() {
             }
         }
 
+        // Playing mode status indicator
         ImGui::SameLine(0, 10);
         if (mode == PAUSED)
             ImGui::Text("Mode: Paused");
@@ -260,17 +267,20 @@ void UseImgui::Render() {
         ImGui::InvisibleButton("padding", {5, 5}); // padding
         ImGui::SeparatorText("Visualization"); // Title
 
-        // visualization only displays when sorting algorithm future has a valid result
+        // visualization only displays when sorting algorithm future has a valid result or not loading
         if (!loading || (currentAlgoFuture.valid() && currentAlgoFuture.wait_for(std::chrono::milliseconds(1)) == std::future_status::ready)) {
+            // sets loading to false when the asynchronous function is finished
             if (loading) {
                 loading = false;
-                currentAlgo = currentAlgoFuture.get();
+                currentAlgo = currentAlgoFuture.get(); // retrieve sorting results from the future object
             }
-            if(mode != PAUSED){
+
+            // here we have the logic for stepping through the visualization at the correct speed if the mode == playing
+            if (mode != PAUSED) {
                 std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
                 std::chrono::seconds oneSecond(1);
-                if(now >= (lastStepTime + (oneSecond / (stepSpeed * 2)))){
-                    if(mode != REVERSE){
+                if (now >= (lastStepTime + (oneSecond / (stepSpeed * 2)))) {
+                    if (mode != REVERSE) {
                         stepForward();
                     } else {
                         stepBack();
@@ -279,15 +289,14 @@ void UseImgui::Render() {
                 }
             }
 
-            // these variables represent the lowest and highest values of the population, so they'll change when we figure out how we're generating the data
-            const float scaleMin = 10000.0f;
-            const float scaleMax = 1000000.0f;
+            const float scaleMin = 10000.0f; // lowest pop size
+            const float scaleMax = 1000000.0f; // highest pop size
             ImGui::SetNextItemWidth(ImGui::GetWindowWidth() * 0.99);
-            ImGui::PushStyleColor(ImGuiCol_PlotLines, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-            ImGui::PlotHistogram("", currentPlotData, 1000, 0, nullptr, scaleMin, scaleMax, {0.0f, 575.0f});
+            ImGui::PushStyleColor(ImGuiCol_PlotLines, ImVec4(1.0f, 0.0f, 0.0f, 1.0f)); // styling
+            ImGui::PushStyleColor(ImGuiCol_PlotHistogram, ImVec4(1.0f, 0.0f, 0.0f, 1.0f)); // styling
+            ImGui::PlotHistogram("", currentPlotData, 1000, 0, nullptr, scaleMin, scaleMax, {0.0f, 575.0f}); // current sort step is rendered
             ImGui::PopStyleColor(2);
-            if (ImGui::IsItemHovered()) {
+            if (ImGui::IsItemHovered()) { // logic for showing tooltip with city name and population on hover
                 int pos = (int)((io->MousePos.x - 12) / 1231 * 1000 + 1);
                 if (pos < 0) pos = 0;
                 if (pos > 999) pos = 999;
@@ -329,10 +338,12 @@ void UseImgui::Render() {
         ResetDevice();
 }
 
+// destructor, runs on program exit
 UseImgui::~UseImgui() {
     ImGui_ImplDX9_Shutdown();
     ImGui_ImplWin32_Shutdown();
     ImGui::DestroyContext();
+    // delete all stored SortingAlgorithm objects to prevent memory leaks
     for (auto it = createdAlgos.begin(); it != createdAlgos.end(); ++it) {
         delete it->second;
     }

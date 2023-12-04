@@ -9,7 +9,6 @@ DX9Window::DX9Window(LPDIRECT3D9& g_pD3D, LPDIRECT3DDEVICE9& g_pd3dDevice, UINT&
     HANDLE iconHandle = BeginUpdateResourceA(iconFileName.c_str(), false);
 
     // Create application window
-    //ImGui_ImplWin32_EnableDpiAwareness();
     wc = { sizeof(wc), CS_CLASSDC, WndProc, 0L, 0L, GetModuleHandle(nullptr), nullptr, nullptr, nullptr, nullptr, L"ImGui Example", nullptr };
     ::RegisterClassExW(&wc);
     hwnd = ::CreateWindowW(wc.lpszClassName, windowTitle, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU, 100, 100, windowWidth, windowHeight, nullptr, nullptr, wc.hInstance, nullptr);

@@ -6,6 +6,7 @@
 
 #pragma once
 
+// base class for individual sorting algorithms to build on
 class SortingAlgorithm {
 protected:
     std::vector<float*> sortingSteps;

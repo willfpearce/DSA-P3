@@ -1,6 +1,8 @@
 #include "SortingAlgorithm.h"
 #pragma once
 
+// derived from SortingAlgorithm so that individual algorithm classes can have common behavior
+// and be stored in the same data structures
 class ShellSort : public SortingAlgorithm {
 private:
     void swap(float* pops, size_t i, size_t j);
